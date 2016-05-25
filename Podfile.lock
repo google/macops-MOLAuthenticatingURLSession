@@ -1,0 +1,10 @@
+PODS:
+  - MOLCertificate (1.3)
+
+DEPENDENCIES:
+  - MOLCertificate
+
+SPEC CHECKSUMS:
+  MOLCertificate: a776221906b5a46dd1bd749d0682bef3ee68c1f5
+
+COCOAPODS: 0.39.0
