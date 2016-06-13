@@ -259,19 +259,19 @@
     }
   }
 
+  // Print details about the server's leaf certificate.
+  SecCertificateRef firstCert = SecTrustGetCertificateAtIndex(serverTrust, 0);
+  if (firstCert) {
+    MOLCertificate *cert = [[MOLCertificate alloc] initWithSecCertificateRef:firstCert];
+    [self log:@"Server Trust: Server leaf cert: %@", cert];
+  }
+
   // Evaluate the server's cert chain.
   SecTrustResultType result = kSecTrustResultInvalid;
   err = SecTrustEvaluate(serverTrust, &result);
   if (err != errSecSuccess) {
     [self log:@"Server Trust: Unable to evaluate certificate chain for server: %d", err];
     return nil;
-  }
-
-  // Print details about the server's leaf certificate.
-  SecCertificateRef firstCert = SecTrustGetCertificateAtIndex(serverTrust, 0);
-  if (firstCert) {
-    MOLCertificate *cert = [[MOLCertificate alloc] initWithSecCertificateRef:firstCert];
-    [self log:@"Server Trust: Server leaf cert: %@", cert];
   }
 
   // Having a trust level "unspecified" by the user is the usual result, described at
