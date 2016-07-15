@@ -18,7 +18,7 @@
   A wrapper around `NSURLSession` providing validation of server certificates and easy-to-use
   client certificate authentication.
 */
-@interface MOLAuthenticatingURLSession : NSObject<NSURLSessionDelegate>
+@interface MOLAuthenticatingURLSession : NSObject<NSURLSessionDelegate, NSURLSessionDataDelegate>
 
 /**
   Returns a new NSURLSession configured with the correct delegate and session configuration.
@@ -94,6 +94,20 @@
   certain authentication issues occur.
 */
 @property(copy) void (^loggingBlock)(NSString *);
+
+/**
+  If set, this block will be called when the URLSession:task:didCompleteWithError: delegate
+  method is called.
+*/
+@property(copy) void
+    (^taskDidCompleteWithErrorBlock)(NSURLSession *, NSURLSessionTask *, NSError *);
+
+/**
+  If set, this block will be called when the URLSession:dataTask:didReceiveData: delegate
+  method is called.
+*/
+@property(copy) void
+    (^dataTaskDidReceiveDataBlock)(NSURLSession *, NSURLSessionDataTask *, NSData *);
 
 /** Designated initializer */
 - (instancetype)initWithSessionConfiguration:(NSURLSessionConfiguration *)configuration;
