@@ -131,7 +131,7 @@
 }
 
 - (void)URLSession:(NSURLSession *)session
-              task:(NSURLSessionTask *)task
+                    task:(NSURLSessionTask *)task
     didCompleteWithError:(NSError *)error {
   if (self.taskDidCompleteWithErrorBlock) {
     self.taskDidCompleteWithErrorBlock(session, task, error);
@@ -140,9 +140,9 @@
 
 #pragma mark NSURLSessionDataDelegate methods
 
-- (void) URLSession:(NSURLSession *)session
-           dataTask:(NSURLSessionDataTask *)dataTask
-     didReceiveData:(NSData *)data {
+- (void)URLSession:(NSURLSession *)session
+          dataTask:(NSURLSessionDataTask *)dataTask
+    didReceiveData:(NSData *)data {
   if (self.dataTaskDidReceiveDataBlock) {
     self.dataTaskDidReceiveDataBlock(session, dataTask, data);
   }
