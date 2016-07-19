@@ -214,6 +214,11 @@
   }
 
   if (foundIdentity) {
+    SecCertificateRef certificate = NULL;
+    SecIdentityCopyCertificate(foundIdentity, &certificate);
+    MOLCertificate *clientCert = [[MOLCertificate alloc] initWithSecCertificateRef:certificate];
+    if (certificate) CFRelease(certificate);
+    if (clientCert) [self log:@"Client Trust: %@", clientCert];
     NSURLCredential *cred =
         [NSURLCredential credentialWithIdentity:foundIdentity
                                    certificates:nil
@@ -281,7 +286,7 @@
   SecCertificateRef firstCert = SecTrustGetCertificateAtIndex(serverTrust, 0);
   if (firstCert) {
     MOLCertificate *cert = [[MOLCertificate alloc] initWithSecCertificateRef:firstCert];
-    [self log:@"Server Trust: Server leaf cert: %@", cert];
+    [self log:@"Server Trust: %@", cert];
   }
 
   // Evaluate the server's cert chain.
