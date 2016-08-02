@@ -19,6 +19,7 @@
 
 @interface MOLAuthenticatingURLSession ()
 @property NSURLSessionConfiguration *sessionConfig;
+@property(copy, nonatomic) NSArray *anchors;
 @end
 
 @implementation MOLAuthenticatingURLSession
@@ -57,6 +58,33 @@
   if (!addlHeaders) addlHeaders = [NSMutableDictionary dictionary];
   addlHeaders[@"User-Agent"] = userAgent;
   self.sessionConfig.HTTPAdditionalHeaders = addlHeaders;
+}
+
+#pragma mark Server Roots properties
+
+- (void)setServerRootsPemFile:(NSString *)serverRootsPemFile {
+  NSError *error;
+  NSData *rootsData = [NSData dataWithContentsOfFile:serverRootsPemFile
+                                             options:0
+                                               error:&error];
+  if (!rootsData) {
+    [self log:@"Unable to read server root certificate file %@ with error: %@",
+        self.serverRootsPemFile, error.localizedDescription];
+  }
+  self.serverRootsPemData = rootsData;
+}
+
+- (void)setServerRootsPemData:(NSData *)serverRootsPemData {
+  NSString *pemStrings = [[NSString alloc] initWithData:serverRootsPemData
+                                               encoding:NSASCIIStringEncoding];
+  NSArray *certs = [MOLCertificate certificatesFromPEM:pemStrings];
+
+  // Make a new array of the SecCertificateRef's from the MOLCertificate's.
+  NSMutableArray *certRefs = [[NSMutableArray alloc] initWithCapacity:certs.count];
+  for (MOLCertificate *cert in certs) {
+    [certRefs addObject:(id)cert.certRef];
+  }
+  self.anchors = certRefs;
 }
 
 #pragma mark NSURLSessionDelegate methods
@@ -223,6 +251,7 @@
         [NSURLCredential credentialWithIdentity:foundIdentity
                                    certificates:nil
                                     persistence:NSURLCredentialPersistenceForSession];
+    if (foundIdentity) CFRelease(foundIdentity);
     return cred;
   } else {
     return nil;
@@ -242,48 +271,44 @@
 ///  If the server's certificate chain does not evaluate for any reason, returns nil.
 ///
 - (NSURLCredential *)serverCredentialForProtectionSpace:(NSURLProtectionSpace *)protectionSpace {
-  SecTrustRef serverTrust = protectionSpace.serverTrust;
-  if (serverTrust == NULL) {
+  if (protectionSpace.serverTrust == NULL) {
     [self log:@"Server Trust: No server trust information available"];
     return nil;
   }
 
   OSStatus err = errSecSuccess;
 
-  if (self.serverRootsPemFile) {
-    NSError *error;
-    NSData *rootsData = [NSData dataWithContentsOfFile:self.serverRootsPemFile
-                                               options:0
-                                                 error:&error];
-    if (!rootsData) {
-      [self log:@"Unable to read server root certificate file %@ with error: %@",
-          self.serverRootsPemFile, error.localizedDescription];
-      return nil;
-    }
-    self.serverRootsPemData = rootsData;
-  }
+  // A local SecTrustRef to store custom anchors if they exist. SecTrustSetAnchorCertificates in
+  // combination with SecTrustEvaluate will leak a SecTrustRef if we were to set the anchors on
+  // protectionSpace.serverTrust. If there are custom anchors serverTrust will be evaluated, if
+  // there are no custom anchors protectionSpace.serverTrust will be evaluated.
+  SecTrustRef serverTrust = NULL;
 
-  if (self.serverRootsPemData) {
-    NSString *pemStrings = [[NSString alloc] initWithData:self.serverRootsPemData
-                                                 encoding:NSASCIIStringEncoding];
-    NSArray *certs = [MOLCertificate certificatesFromPEM:pemStrings];
-
-    // Make a new array of the SecCertificateRef's from the MOLCertificate's.
-    NSMutableArray *certRefs = [[NSMutableArray alloc] initWithCapacity:certs.count];
-    for (MOLCertificate *cert in certs) {
-      [certRefs addObject:(id)cert.certRef];
+  if (self.anchors) {
+    CFArrayRef policies = NULL;
+    SecTrustCopyPolicies(protectionSpace.serverTrust, &policies);
+    int certCount = (int)SecTrustGetCertificateCount(protectionSpace.serverTrust);
+    NSMutableArray *serverTrustCertRefs = [[NSMutableArray alloc] initWithCapacity:certCount];
+    for (int i = 0; i < certCount; ++i) {
+      [serverTrustCertRefs addObject:
+          (__bridge id)SecTrustGetCertificateAtIndex(protectionSpace.serverTrust, i)];
     }
+
+    // Create a copy of protectionSpace.serverTrust by grabbing its policies and certificates.
+    SecTrustCreateWithCertificates((__bridge CFTypeRef)serverTrustCertRefs, policies, &serverTrust);
+    if (policies) CFRelease(policies);
 
     // Set this array of certs as the anchors to trust.
-    err = SecTrustSetAnchorCertificates(serverTrust, (__bridge CFArrayRef)certRefs);
+    err = SecTrustSetAnchorCertificates(serverTrust, (__bridge CFArrayRef)self.anchors);
     if (err != errSecSuccess) {
       [self log:@"Server Trust: Could not set anchor certificates: %d", err];
+      if (serverTrust) CFRelease(serverTrust);
       return nil;
     }
   }
 
   // Print details about the server's leaf certificate.
-  SecCertificateRef firstCert = SecTrustGetCertificateAtIndex(serverTrust, 0);
+  SecCertificateRef firstCert = SecTrustGetCertificateAtIndex(protectionSpace.serverTrust, 0);
   if (firstCert) {
     MOLCertificate *cert = [[MOLCertificate alloc] initWithSecCertificateRef:firstCert];
     [self log:@"Server Trust: %@", cert];
@@ -291,9 +316,10 @@
 
   // Evaluate the server's cert chain.
   SecTrustResultType result = kSecTrustResultInvalid;
-  err = SecTrustEvaluate(serverTrust, &result);
+  err = SecTrustEvaluate(serverTrust ?: protectionSpace.serverTrust, &result);
   if (err != errSecSuccess) {
     [self log:@"Server Trust: Unable to evaluate certificate chain for server: %d", err];
+    if (serverTrust) CFRelease(serverTrust);
     return nil;
   }
 
@@ -301,10 +327,14 @@
   // https://developer.apple.com/library/mac/qa/qa1360
   if (result != kSecTrustResultProceed && result != kSecTrustResultUnspecified) {
     [self log:@"Server Trust: Server isn't trusted. SecTrustResultType: %d", result];
+    if (serverTrust) CFRelease(serverTrust);
     return nil;
   }
 
-  return [NSURLCredential credentialForTrust:serverTrust];
+  NSURLCredential *cred = [NSURLCredential
+                              credentialForTrust:serverTrust ?: protectionSpace.serverTrust];
+  if (serverTrust) CFRelease(serverTrust);
+  return cred;
 }
 
 /**
