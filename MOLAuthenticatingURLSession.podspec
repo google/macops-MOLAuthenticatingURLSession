@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = 'MOLAuthenticatingURLSession'
-  s.version      = '1.8'
+  s.version      = '1.9'
   s.platform     = :osx
   s.license      = { :type => 'Apache 2.0', :file => 'LICENSE' }
   s.homepage     = 'https://github.com/google/macops-molauthenticatingurlsession'
