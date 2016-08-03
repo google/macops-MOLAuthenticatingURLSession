@@ -63,6 +63,10 @@
 #pragma mark Server Roots properties
 
 - (void)setServerRootsPemFile:(NSString *)serverRootsPemFile {
+  if (!serverRootsPemFile) {
+    _serverRootsPemFile = nil;
+    return;
+  }
   NSError *error;
   NSData *rootsData = [NSData dataWithContentsOfFile:serverRootsPemFile
                                              options:0
@@ -75,6 +79,10 @@
 }
 
 - (void)setServerRootsPemData:(NSData *)serverRootsPemData {
+  if (!serverRootsPemData) {
+    _serverRootsPemData = nil;
+    return;
+  }
   NSString *pemStrings = [[NSString alloc] initWithData:serverRootsPemData
                                                encoding:NSASCIIStringEncoding];
   NSArray *certs = [MOLCertificate certificatesFromPEM:pemStrings];
