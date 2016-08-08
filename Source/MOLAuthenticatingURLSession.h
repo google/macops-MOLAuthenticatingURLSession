@@ -46,18 +46,6 @@
 */
 @property(copy, nonatomic) NSString *serverHostname;
 
-/**
-  This should be PEM data containing one or more certificates to use to verify the server's
-  certificate chain. This will override the trusted system roots.
-*/
-@property(copy, nonatomic) NSData *serverRootsPemData;
-
-/**
-  This should be the path to a PEM file containing one or more certificates to use to verify
-  the server's certificate chain. This will override the trusted system roots.
-*/
-@property(copy, nonatomic) NSString *serverRootsPemFile;
-
 /**  If set and client certificate authentication is needed, the pkcs#12 file will be loaded */
 @property(copy, nonatomic) NSString *clientCertFile;
 
@@ -109,7 +97,21 @@
 @property(copy) void
     (^dataTaskDidReceiveDataBlock)(NSURLSession *, NSURLSessionDataTask *, NSData *);
 
-/** Designated initializer */
+/**
+  This method should be called with PEM data containing one or more certificates to use to verify the
+  server's certificate chain. This will override the trusted system roots. If there are no usable
+  certificates within the data, the trusted system roots will be used.
+*/
+- (void)setServerRootsPemData:(NSData *)serverRootsPemData;
+
+/**
+  This method should be called with the path to a PEM file containing one or more certificates to use
+  to verify the server's certificate chain. This will override the trusted system roots. If there are
+  no usable certificates within the file, the trusted system roots will be used.
+*/
+- (void)setServerRootsPemFile:(NSString *)serverRootsPemFile;
+
+/**  Designated initializer */
 - (instancetype)initWithSessionConfiguration:(NSURLSessionConfiguration *)configuration;
 
 @end

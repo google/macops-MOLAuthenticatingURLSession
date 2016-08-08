@@ -60,33 +60,32 @@
   self.sessionConfig.HTTPAdditionalHeaders = addlHeaders;
 }
 
-#pragma mark Server Roots properties
+#pragma mark Server Roots
 
 - (void)setServerRootsPemFile:(NSString *)serverRootsPemFile {
-  if (!serverRootsPemFile) {
-    _serverRootsPemFile = nil;
-    return;
-  }
+  if (!serverRootsPemFile) return [self setServerRootsPemData:nil];
   NSError *error;
   NSData *rootsData = [NSData dataWithContentsOfFile:serverRootsPemFile
                                              options:0
                                                error:&error];
   if (!rootsData) {
-    [self log:@"Unable to read server root certificate file %@ with error: %@",
-        self.serverRootsPemFile, error.localizedDescription];
+    return [self log:@"Unable to read server root certificate file %@ with error: %@",
+            serverRootsPemFile, error.localizedDescription];
   }
-  self.serverRootsPemData = rootsData;
+  [self setServerRootsPemData:rootsData];
 }
 
 - (void)setServerRootsPemData:(NSData *)serverRootsPemData {
   if (!serverRootsPemData) {
-    _serverRootsPemData = nil;
+    self.anchors = nil;
     return;
   }
   NSString *pemStrings = [[NSString alloc] initWithData:serverRootsPemData
                                                encoding:NSASCIIStringEncoding];
   NSArray *certs = [MOLCertificate certificatesFromPEM:pemStrings];
-
+  if (!certs.count) {
+    return [self log:@"Unable to read server root certificates from data %@", serverRootsPemData];
+  }
   // Make a new array of the SecCertificateRef's from the MOLCertificate's.
   NSMutableArray *certRefs = [[NSMutableArray alloc] initWithCapacity:certs.count];
   for (MOLCertificate *cert in certs) {
