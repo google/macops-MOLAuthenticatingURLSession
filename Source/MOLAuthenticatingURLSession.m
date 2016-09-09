@@ -285,31 +285,12 @@
 
   OSStatus err = errSecSuccess;
 
-  // A local SecTrustRef to store custom anchors if they exist. SecTrustSetAnchorCertificates in
-  // combination with SecTrustEvaluate will leak a SecTrustRef if we were to set the anchors on
-  // protectionSpace.serverTrust. If there are custom anchors serverTrust will be evaluated, if
-  // there are no custom anchors protectionSpace.serverTrust will be evaluated.
-  SecTrustRef serverTrust = NULL;
-
   if (self.anchors) {
-    CFArrayRef policies = NULL;
-    SecTrustCopyPolicies(protectionSpace.serverTrust, &policies);
-    int certCount = (int)SecTrustGetCertificateCount(protectionSpace.serverTrust);
-    NSMutableArray *serverTrustCertRefs = [[NSMutableArray alloc] initWithCapacity:certCount];
-    for (int i = 0; i < certCount; ++i) {
-      [serverTrustCertRefs addObject:
-          (__bridge id)SecTrustGetCertificateAtIndex(protectionSpace.serverTrust, i)];
-    }
-
-    // Create a copy of protectionSpace.serverTrust by grabbing its policies and certificates.
-    SecTrustCreateWithCertificates((__bridge CFTypeRef)serverTrustCertRefs, policies, &serverTrust);
-    if (policies) CFRelease(policies);
-
-    // Set this array of certs as the anchors to trust.
-    err = SecTrustSetAnchorCertificates(serverTrust, (__bridge CFArrayRef)self.anchors);
+    // Set the anchors to be used during evaluation
+    err = SecTrustSetAnchorCertificates(protectionSpace.serverTrust,
+                                        (__bridge CFArrayRef)self.anchors);
     if (err != errSecSuccess) {
       [self log:@"Server Trust: Could not set anchor certificates: %d", err];
-      if (serverTrust) CFRelease(serverTrust);
       return nil;
     }
   }
@@ -323,10 +304,9 @@
 
   // Evaluate the server's cert chain.
   SecTrustResultType result = kSecTrustResultInvalid;
-  err = SecTrustEvaluate(serverTrust ?: protectionSpace.serverTrust, &result);
+  err = SecTrustEvaluate(protectionSpace.serverTrust, &result);
   if (err != errSecSuccess) {
     [self log:@"Server Trust: Unable to evaluate certificate chain for server: %d", err];
-    if (serverTrust) CFRelease(serverTrust);
     return nil;
   }
 
@@ -334,14 +314,11 @@
   // https://developer.apple.com/library/mac/qa/qa1360
   if (result != kSecTrustResultProceed && result != kSecTrustResultUnspecified) {
     [self log:@"Server Trust: Server isn't trusted. SecTrustResultType: %d", result];
-    if (serverTrust) CFRelease(serverTrust);
     return nil;
   }
 
-  NSURLCredential *cred = [NSURLCredential
-                              credentialForTrust:serverTrust ?: protectionSpace.serverTrust];
-  if (serverTrust) CFRelease(serverTrust);
-  return cred;
+  // Create and return the credential
+  return [NSURLCredential credentialForTrust:protectionSpace.serverTrust];
 }
 
 /**
