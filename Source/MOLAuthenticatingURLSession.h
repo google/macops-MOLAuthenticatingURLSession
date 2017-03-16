@@ -98,6 +98,19 @@
     (^dataTaskDidReceiveDataBlock)(NSURLSession *, NSURLSessionDataTask *, NSData *);
 
 /**
+  If set, this block will be called when a redirect is attempted. This overrides the
+  refusesRedirects property as you are taking responsibility for handling redirects.
+
+  @param task, The task this redirect is related to.
+  @param request, The new request, pre-filled.
+  @param response, The response from the server to the request that caused the redirect.
+  @return request, A valid request to make or nil to refuse the redirect. Returning the request
+      passed as the third parameter is valid.
+*/
+@property(copy) NSURLRequest *
+    (^redirectHandlerBlock)(NSURLSessionTask *, NSHTTPURLResponse *, NSURLRequest *);
+
+/**
   This method should be called with PEM data containing one or more certificates to use to verify the
   server's certificate chain. This will override the trusted system roots. If there are no usable
   certificates within the data, the trusted system roots will be used.

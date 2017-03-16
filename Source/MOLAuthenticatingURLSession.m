@@ -156,9 +156,9 @@
     willPerformHTTPRedirection:(NSHTTPURLResponse *)response
                     newRequest:(NSURLRequest *)request
              completionHandler:(void (^)(NSURLRequest *))completionHandler {
-  if (self.refusesRedirects) {
-    [self log:@"Rejected redirection to: %@", request.URL];
-    [task cancel];  // without this, the connection hangs until timeout!?!
+  if (self.redirectHandlerBlock) {
+    completionHandler(self.redirectHandlerBlock(task, response, request));
+  } else if (self.refusesRedirects) {
     completionHandler(NULL);
   } else {
     completionHandler(request);
