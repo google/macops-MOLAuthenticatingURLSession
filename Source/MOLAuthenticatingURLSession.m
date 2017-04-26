@@ -403,8 +403,11 @@
     [self log:@"Client Trust: Couldn't load client certificate %@: %d", self.clientCertFile, err];
     return nil;
   }
+  
+  CFDictionaryRef firstDict = [identities firstObject];
+  SecIdentityRef firstRef = (__bridge SecIdentityRef)firstDict[(__bridge id)kSecImportItemIdentity];
 
-  return (__bridge SecIdentityRef)[identities firstObject][(__bridge id)kSecImportItemIdentity];
+  return (firstRef != NULL) ? CFRetain(firstRef) : NULL;
 }
 
 - (void)log:(NSString *)format, ... {
