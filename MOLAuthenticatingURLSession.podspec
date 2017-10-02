@@ -2,6 +2,7 @@ Pod::Spec.new do |s|
   s.name         = 'MOLAuthenticatingURLSession'
   s.version      = '2.3'
   s.platform     = :osx
+  s.osx.deployment_target  = '10.9'
   s.license      = { :type => 'Apache 2.0', :file => 'LICENSE' }
   s.homepage     = 'https://github.com/google/macops-MOLAuthenticatingURLSession'
   s.authors      = { 'Google Macops' => 'macops-external@google.com' }
