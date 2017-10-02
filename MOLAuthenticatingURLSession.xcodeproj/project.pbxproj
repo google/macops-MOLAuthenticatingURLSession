@@ -16,13 +16,14 @@
 		0DB77FF81CD2ADFD004DF060 /* MOLDERDecoderTest.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DB77FE11CD2AA59004DF060 /* MOLDERDecoderTest.m */; };
 		0DB77FF91CD2AE05004DF060 /* MOLDERDecoder.m in Sources */ = {isa = PBXBuildFile; fileRef = 0DB77FE01CD2AA59004DF060 /* MOLDERDecoder.m */; };
 		0DB77FFA1CD2AE22004DF060 /* dn.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0DB77FE81CD2AAA3004DF060 /* dn.plist */; };
-		C8C5E00EEA5D82A8881D549F /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2C4DD58B7B09EBD0312ED8D0 /* libPods.a */; };
+		FC01CB1DC688C23A9FC37D47 /* libPods-MOLAuthenticatingURLSession.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0D708589E33BD207F6B12A38 /* libPods-MOLAuthenticatingURLSession.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		0D5058AE1CB42C26008784BA /* MOLAuthenticatingURLSession.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = MOLAuthenticatingURLSession.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0D5058C61CB42C91008784BA /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		0D5058C81CB42C94008784BA /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		0D708589E33BD207F6B12A38 /* libPods-MOLAuthenticatingURLSession.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-MOLAuthenticatingURLSession.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		0DB77FDD1CD2AA59004DF060 /* MOLAuthenticatingURLSession.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MOLAuthenticatingURLSession.h; sourceTree = "<group>"; };
 		0DB77FDE1CD2AA59004DF060 /* MOLAuthenticatingURLSession.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MOLAuthenticatingURLSession.m; sourceTree = "<group>"; };
 		0DB77FDF1CD2AA59004DF060 /* MOLDERDecoder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MOLDERDecoder.h; sourceTree = "<group>"; };
@@ -31,9 +32,8 @@
 		0DB77FE81CD2AAA3004DF060 /* dn.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = dn.plist; path = Tests/dn.plist; sourceTree = "<group>"; };
 		0DB77FED1CD2AAD6004DF060 /* MOLAuthenticatingURLSessionTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MOLAuthenticatingURLSessionTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		0DB77FF51CD2ACAF004DF060 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Source/Info.plist; sourceTree = SOURCE_ROOT; };
-		2C4DD58B7B09EBD0312ED8D0 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		6397605463C8CAB1157643B0 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
-		DBD777EB8F936E36864AD7F7 /* Pods.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.debug.xcconfig; path = "Pods/Target Support Files/Pods/Pods.debug.xcconfig"; sourceTree = "<group>"; };
+		541C9F1226CD220033327E4A /* Pods-MOLAuthenticatingURLSession.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MOLAuthenticatingURLSession.release.xcconfig"; path = "Pods/Target Support Files/Pods-MOLAuthenticatingURLSession/Pods-MOLAuthenticatingURLSession.release.xcconfig"; sourceTree = "<group>"; };
+		6B9273968EF47A574C7229B3 /* Pods-MOLAuthenticatingURLSession.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MOLAuthenticatingURLSession.debug.xcconfig"; path = "Pods/Target Support Files/Pods-MOLAuthenticatingURLSession/Pods-MOLAuthenticatingURLSession.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -43,7 +43,7 @@
 			files = (
 				0D5058C91CB42C94008784BA /* Security.framework in Frameworks */,
 				0D5058C71CB42C91008784BA /* Foundation.framework in Frameworks */,
-				C8C5E00EEA5D82A8881D549F /* libPods.a in Frameworks */,
+				FC01CB1DC688C23A9FC37D47 /* libPods-MOLAuthenticatingURLSession.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -64,7 +64,7 @@
 				0DB77FE71CD2AA5D004DF060 /* Tests */,
 				0D5058AF1CB42C26008784BA /* Products */,
 				0D5058CA1CB42CA3008784BA /* Frameworks */,
-				166C617B9323485C1BA23D15 /* Pods */,
+				45EF3278AF2667603A4D1D29 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -94,7 +94,7 @@
 			children = (
 				0D5058C81CB42C94008784BA /* Security.framework */,
 				0D5058C61CB42C91008784BA /* Foundation.framework */,
-				2C4DD58B7B09EBD0312ED8D0 /* libPods.a */,
+				0D708589E33BD207F6B12A38 /* libPods-MOLAuthenticatingURLSession.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -108,11 +108,11 @@
 			name = Tests;
 			sourceTree = "<group>";
 		};
-		166C617B9323485C1BA23D15 /* Pods */ = {
+		45EF3278AF2667603A4D1D29 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				DBD777EB8F936E36864AD7F7 /* Pods.debug.xcconfig */,
-				6397605463C8CAB1157643B0 /* Pods.release.xcconfig */,
+				6B9273968EF47A574C7229B3 /* Pods-MOLAuthenticatingURLSession.debug.xcconfig */,
+				541C9F1226CD220033327E4A /* Pods-MOLAuthenticatingURLSession.release.xcconfig */,
 			);
 			name = Pods;
 			sourceTree = "<group>";
@@ -136,11 +136,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 0D5058B61CB42C26008784BA /* Build configuration list for PBXNativeTarget "MOLAuthenticatingURLSession" */;
 			buildPhases = (
-				21E8565DEA79B2B43183D865 /* Check Pods Manifest.lock */,
+				F9FE75052D691C0603F7030F /* [CP] Check Pods Manifest.lock */,
 				0D5058A91CB42C26008784BA /* Sources */,
 				0D5058AA1CB42C26008784BA /* Frameworks */,
 				0D5058AB1CB42C26008784BA /* Headers */,
-				F32C5C87A52E3F7D34EFE44A /* Copy Pods Resources */,
+				FF3022C630602DA4CC166CCC /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -174,7 +174,7 @@
 		0D5058A51CB42C26008784BA /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastUpgradeCheck = 0720;
+				LastUpgradeCheck = 0830;
 				ORGANIZATIONNAME = "Google Inc";
 				TargetAttributes = {
 					0D5058AD1CB42C26008784BA = {
@@ -215,34 +215,34 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		21E8565DEA79B2B43183D865 /* Check Pods Manifest.lock */ = {
+		F9FE75052D691C0603F7030F /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Check Pods Manifest.lock";
+			name = "[CP] Check Pods Manifest.lock";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n";
 			showEnvVarsInLog = 0;
 		};
-		F32C5C87A52E3F7D34EFE44A /* Copy Pods Resources */ = {
+		FF3022C630602DA4CC166CCC /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
-			name = "Copy Pods Resources";
+			name = "[CP] Copy Pods Resources";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods/Pods-resources.sh\"\n";
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-MOLAuthenticatingURLSession/Pods-MOLAuthenticatingURLSession-resources.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
 /* End PBXShellScriptBuildPhase section */
@@ -280,10 +280,13 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "-";
@@ -326,10 +329,13 @@
 				CLANG_WARN_BOOL_CONVERSION = YES;
 				CLANG_WARN_CONSTANT_CONVERSION = YES;
 				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
 				CLANG_WARN_EMPTY_BODY = YES;
 				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
 				CLANG_WARN_INT_CONVERSION = YES;
 				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				CODE_SIGN_IDENTITY = "-";
@@ -356,7 +362,7 @@
 		};
 		0D5058B71CB42C26008784BA /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = DBD777EB8F936E36864AD7F7 /* Pods.debug.xcconfig */;
+			baseConfigurationReference = 6B9273968EF47A574C7229B3 /* Pods-MOLAuthenticatingURLSession.debug.xcconfig */;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
 				DEFINES_MODULE = YES;
@@ -375,7 +381,7 @@
 		};
 		0D5058B81CB42C26008784BA /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 6397605463C8CAB1157643B0 /* Pods.release.xcconfig */;
+			baseConfigurationReference = 541C9F1226CD220033327E4A /* Pods-MOLAuthenticatingURLSession.release.xcconfig */;
 			buildSettings = {
 				COMBINE_HIDPI_IMAGES = YES;
 				DEFINES_MODULE = YES;
