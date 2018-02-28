@@ -14,7 +14,7 @@
 
 #import <XCTest/XCTest.h>
 
-#import "MOLDERDecoder.h"
+#import <MOLAuthenticatingURLSession/MOLDERDecoder.h>
 
 @interface MOLDERDecoder (Testing)
 + (NSString *)decodeOIDWithBytes:(unsigned char *)bytes length:(NSUInteger)length;
