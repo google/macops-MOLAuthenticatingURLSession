@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = 'MOLAuthenticatingURLSession'
-  s.version      = '2.4'
+  s.version      = '2.5'
   s.platform     = :osx
   s.osx.deployment_target  = '10.9'
   s.license      = { :type => 'Apache 2.0', :file => 'LICENSE' }
@@ -11,5 +11,5 @@ Pod::Spec.new do |s|
                      :tag => "v#{s.version}" }
   s.source_files = 'Source/MOLAuthenticatingURLSession/*.{h,m}'
   s.framework    = 'Security'
-  s.dependency 'MOLCertificate', '~> 1.8'
+  s.dependency 'MOLCertificate', '~> 2.0'
 end
