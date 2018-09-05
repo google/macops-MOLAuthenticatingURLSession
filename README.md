@@ -1,5 +1,5 @@
 # MOLAuthenticatingURLSession
-A wrapper around `NSURLSession` providing validation of server certificates 
+A wrapper around `NSURLSession` providing validation of server certificates
 and easy-to-use client certificate authentication.
 
 Requires ARC. Tested on OS X 10.11+.
@@ -30,13 +30,44 @@ If you'd like to print status/error information:
 
 ## Installation
 
-Install using CocoaPods.
+#### Using CocoaPods
+
+Add the following line to your Podfile:
 
 ```
 pod 'MOLAuthenticatingURLSession'
 ```
 
-You can also import the project manually but this isn't tested.
+#### Using [Bazel](http://bazel.build)
+
+Add the following to your WORKSPACE:
+
+```
+load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
+
+# Needed for MOLAuthenticatingURLSession
+git_repository(
+    name = "MOLCertificate",
+    remote = "https://github.com/google/macops-molcertificate.git",
+    tag = "v2.0",
+)
+
+git_repository(
+    name = "MOLAuthenticatingURLSession",
+    remote = "https://github.com/google/macops-molauthenticatingurlsession.git",
+    tag = "v2.5",
+)
+```
+
+And in your BUILD file, add MOLXPCConnection as a dependency:
+
+<pre>
+objc_library(
+    name = "MyAwesomeApp_lib",
+    srcs = ["src/MyAwesomeApp.m", "src/MyAwesomeApp.h"],
+    <strong>deps = ["@MOLAuthenticatingURLSession//:MOLAuthenticatingURLSession"],</strong>
+)
+</pre>
 
 ## Documentation
 

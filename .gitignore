@@ -1,4 +1,3 @@
 .DS_Store
 Pods
-*.xcodeproj/xcuserdata
-*.xcworkspace
+bazel-*
