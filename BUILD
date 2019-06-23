@@ -10,8 +10,8 @@ objc_library(
     hdrs = ["Source/MOLAuthenticatingURLSession/MOLAuthenticatingURLSession.h"],
     includes = ["Source"],
     sdk_frameworks = ["Security"],
-    deps = ["@MOLCertificate//:MOLCertificate"],
     visibility = ["//visibility:public"],
+    deps = ["@MOLCertificate//:MOLCertificate"],
 )
 
 objc_library(
@@ -21,7 +21,7 @@ objc_library(
         "Source/MOLAuthenticatingURLSession/MOLDERDecoder.h",
         "Tests/MOLDERDecoderTest.m",
     ],
-    resources = ["Tests/dn.plist"],
+    data = ["Tests/dn.plist"],
     deps = [":MOLAuthenticatingURLSession"],
 )
 
