@@ -432,13 +432,16 @@
   // without calling this but the documentation is clear that
   // SecTrustGetCertificateAtIndex shouldn't be called without calling
   // SecTrustEvaluate first.
-  SecTrustEvaluate(t, NULL);
+  SecTrustResultType _;  // unused
+  SecTrustEvaluate(t, &_);
 
   NSMutableArray *intermediates = [NSMutableArray array];
-  for (int i = 1; i < SecTrustGetCertificateCount(t); ++i) {
+  CFIndex certCount = SecTrustGetCertificateCount(t);
+  for (int i = 1; i < certCount; ++i) {
     [intermediates addObject:(id)SecTrustGetCertificateAtIndex(t, i)];
   }
   CFRelease(t);
+
   return intermediates;
 }
 
