@@ -3,7 +3,7 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 git_repository(
     name = "build_bazel_rules_apple",
     remote = "https://github.com/bazelbuild/rules_apple.git",
-    tag = "0.6.0",
+    tag = "0.17.2",
 )
 
 load(
@@ -16,5 +16,5 @@ apple_rules_dependencies()
 git_repository(
     name = "MOLCertificate",
     remote = "https://github.com/google/macops-molcertificate.git",
-    tag = "v2.0",
+    tag = "v2.1",
 )

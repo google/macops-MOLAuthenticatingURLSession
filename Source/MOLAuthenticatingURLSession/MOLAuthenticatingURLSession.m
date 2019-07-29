@@ -203,6 +203,7 @@
 - (NSURLCredential *)clientCredentialForProtectionSpace:(NSURLProtectionSpace *)protectionSpace {
   __block SecIdentityRef foundIdentity = NULL;
 
+  NSArray *allCerts;
   if (self.clientCertFile) {
     foundIdentity = [self identityFromFile:self.clientCertFile password:self.clientCertPassword];
   } else {
@@ -214,7 +215,7 @@
     }, (CFTypeRef *)&cfResults);
     NSArray *results = CFBridgingRelease(cfResults);
 
-    NSMutableArray *allCerts = [[MOLCertificate certificatesFromArray:results] mutableCopy];
+    allCerts = [MOLCertificate certificatesFromArray:results];
 
     if (self.clientCertCommonName) {
       foundIdentity = [self identityByFilteringArray:allCerts
@@ -255,9 +256,12 @@
     MOLCertificate *clientCert = [[MOLCertificate alloc] initWithSecCertificateRef:certificate];
     if (certificate) CFRelease(certificate);
     if (clientCert) [self log:@"Client Trust: %@", clientCert];
+
+    NSArray *intermediates = [self locateIntermediatesForCertificate:clientCert inArray:allCerts];
+
     NSURLCredential *cred =
         [NSURLCredential credentialWithIdentity:foundIdentity
-                                   certificates:nil
+                                   certificates:intermediates
                                     persistence:NSURLCredentialPersistenceForSession];
     if (foundIdentity) CFRelease(foundIdentity);
     return cred;
@@ -407,6 +411,38 @@
 
   return (SecIdentityRef)CFBridgingRetain(
       identities.firstObject[(__bridge NSString *)kSecImportItemIdentity]);
+}
+
+// For servers that require the intermediate certificate to be presented when
+// using a client certificate, this method will attempt to locate those
+// intermediates in the keychain. If the intermediate certificate is not in
+// the keychain an empty array will be presented instead.
+- (NSArray *)locateIntermediatesForCertificate:(MOLCertificate *)leafCert
+                                       inArray:(NSArray<MOLCertificate *> *)certs {
+  SecTrustRef t = NULL;
+  OSStatus res = SecTrustCreateWithCertificates(leafCert.certRef, NULL, &t);
+  if (res != errSecSuccess) {
+    NSString *errMsg = CFBridgingRelease(SecCopyErrorMessageString(res, NULL));
+    [self log:@"Failed to create trust for locating intermediate certs: %@", errMsg];
+    return nil;
+  }
+
+  // Evaluate the trust to create the chain, even though we don't
+  // use the result of the evaluation. The certificates seem to be available
+  // without calling this but the documentation is clear that
+  // SecTrustGetCertificateAtIndex shouldn't be called without calling
+  // SecTrustEvaluate first.
+  SecTrustResultType _;  // unused
+  SecTrustEvaluate(t, &_);
+
+  NSMutableArray *intermediates = [NSMutableArray array];
+  CFIndex certCount = SecTrustGetCertificateCount(t);
+  for (int i = 1; i < certCount; ++i) {
+    [intermediates addObject:(id)SecTrustGetCertificateAtIndex(t, i)];
+  }
+  CFRelease(t);
+
+  return intermediates;
 }
 
 - (void)log:(NSString *)format, ... {
