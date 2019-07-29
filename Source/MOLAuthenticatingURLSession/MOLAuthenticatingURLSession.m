@@ -419,24 +419,26 @@
 // the keychain an empty array will be presented instead.
 - (NSArray *)locateIntermediatesForCertificate:(MOLCertificate *)leafCert
                                        inArray:(NSArray<MOLCertificate *> *)certs {
-  NSMutableArray *intermediates = [NSMutableArray array];
-
-  MOLCertificate *next = leafCert;
-
-  BOOL cont = YES;
-  while (cont) {
-    cont = NO;
-    for (MOLCertificate *cert in certs) {
-      if ([cert.commonName isEqual:next.issuerCommonName]) {
-        [self log:@"Located intermediate for cert: %@", cert];
-        [intermediates addObject:(id)cert.certRef];
-        next = cert;
-        cont = YES;
-        break;
-      }
-    }
+  SecTrustRef t = NULL;
+  OSStatus res = SecTrustCreateWithCertificates(leafCert.certRef, NULL, &t);
+  if (res != errSecSuccess) {
+    NSString *errMsg = CFBridgingRelease(SecCopyErrorMessageString(res, NULL));
+    [self log:@"Failed to create trust for locating intermediate certs: %@", errMsg];
+    return nil;
   }
 
+  // Evaluate the trust to create the chain, even though we don't
+  // use the result of the evaluation. The certificates seem to be available
+  // without calling this but the documentation is clear that
+  // SecTrustGetCertificateAtIndex shouldn't be called without calling
+  // SecTrustEvaluate first.
+  SecTrustEvaluate(t, NULL);
+
+  NSMutableArray *intermediates = [NSMutableArray array];
+  for (int i = 1; i < SecTrustGetCertificateCount(t); ++i) {
+    [intermediates addObject:(id)SecTrustGetCertificateAtIndex(t, i)];
+  }
+  CFRelease(t);
   return intermediates;
 }
 
