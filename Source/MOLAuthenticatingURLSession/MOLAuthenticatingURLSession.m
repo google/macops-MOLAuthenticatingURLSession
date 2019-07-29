@@ -203,6 +203,7 @@
 - (NSURLCredential *)clientCredentialForProtectionSpace:(NSURLProtectionSpace *)protectionSpace {
   __block SecIdentityRef foundIdentity = NULL;
 
+  NSArray *allCerts;
   if (self.clientCertFile) {
     foundIdentity = [self identityFromFile:self.clientCertFile password:self.clientCertPassword];
   } else {
@@ -214,7 +215,7 @@
     }, (CFTypeRef *)&cfResults);
     NSArray *results = CFBridgingRelease(cfResults);
 
-    NSMutableArray *allCerts = [[MOLCertificate certificatesFromArray:results] mutableCopy];
+    allCerts = [MOLCertificate certificatesFromArray:results];
 
     if (self.clientCertCommonName) {
       foundIdentity = [self identityByFilteringArray:allCerts
@@ -255,9 +256,12 @@
     MOLCertificate *clientCert = [[MOLCertificate alloc] initWithSecCertificateRef:certificate];
     if (certificate) CFRelease(certificate);
     if (clientCert) [self log:@"Client Trust: %@", clientCert];
+
+    NSArray *intermediates = [self locateIntermediatesForCertificate:clientCert inArray:allCerts];
+
     NSURLCredential *cred =
         [NSURLCredential credentialWithIdentity:foundIdentity
-                                   certificates:nil
+                                   certificates:intermediates
                                     persistence:NSURLCredentialPersistenceForSession];
     if (foundIdentity) CFRelease(foundIdentity);
     return cred;
@@ -407,6 +411,33 @@
 
   return (SecIdentityRef)CFBridgingRetain(
       identities.firstObject[(__bridge NSString *)kSecImportItemIdentity]);
+}
+
+// For servers that require the intermediate certificate to be presented when
+// using a client certificate, this method will attempt to locate those
+// intermediates in the keychain. If the intermediate certificate is not in
+// the keychain an empty array will be presented instead.
+- (NSArray *)locateIntermediatesForCertificate:(MOLCertificate *)leafCert
+                                       inArray:(NSArray<MOLCertificate *> *)certs {
+  NSMutableArray *intermediates = [NSMutableArray array];
+
+  MOLCertificate *next = leafCert;
+
+  BOOL cont = YES;
+  while (cont) {
+    cont = NO;
+    for (MOLCertificate *cert in certs) {
+      if ([cert.commonName isEqual:next.issuerCommonName]) {
+        [self log:@"Located intermediate for cert: %@", cert];
+        [intermediates addObject:(id)cert.certRef];
+        next = cert;
+        cont = YES;
+        break;
+      }
+    }
+  }
+
+  return intermediates;
 }
 
 - (void)log:(NSString *)format, ... {
