@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name         = 'MOLAuthenticatingURLSession'
-  s.version      = '2.7'
+  s.version      = '2.8'
   s.platform     = :osx
   s.osx.deployment_target  = '10.9'
   s.license      = { :type => 'Apache 2.0', :file => 'LICENSE' }
