@@ -261,7 +261,7 @@
 
     NSURLCredential *cred =
         [NSURLCredential credentialWithIdentity:foundIdentity
-                                   certificates:intermediates
+                                   certificates:(intermediates.count) ? intermediates : nil
                                     persistence:NSURLCredentialPersistenceForSession];
     if (foundIdentity) CFRelease(foundIdentity);
     return cred;
