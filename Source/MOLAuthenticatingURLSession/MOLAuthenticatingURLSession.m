@@ -371,10 +371,10 @@
       return identityRef;
     } else {
       // Avoid infinite recursion from self-signed certs
-      if ((cert.commonName && [cert.commonName isEqual:cert.issuerCommonName]) &&
-          (cert.countryName && [cert.countryName isEqual:cert.issuerCountryName]) &&
-          (cert.orgName && [cert.orgName isEqual:cert.issuerOrgName]) &&
-          (cert.orgUnit && [cert.orgUnit isEqual:cert.issuerOrgUnit])) {
+      if ((!cert.commonName || [cert.commonName isEqual:cert.issuerCommonName]) &&
+          (!cert.countryName || [cert.countryName isEqual:cert.issuerCountryName]) &&
+          (!cert.orgName || [cert.orgName isEqual:cert.issuerOrgName]) &&
+          (!cert.orgUnit || [cert.orgUnit isEqual:cert.issuerOrgUnit])) {
         continue;
       }
 
