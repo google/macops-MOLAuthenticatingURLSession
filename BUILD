@@ -1,5 +1,9 @@
 load("@build_bazel_rules_apple//apple:macos.bzl", "macos_unit_test")
 
+licenses(["notice"])
+
+exports_files(["LICENSE"])
+
 objc_library(
     name = "MOLAuthenticatingURLSession",
     srcs = [
