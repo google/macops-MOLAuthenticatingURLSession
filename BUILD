@@ -23,9 +23,15 @@ objc_library(
     testonly = 1,
     srcs = [
         "Source/MOLAuthenticatingURLSession/MOLDERDecoder.h",
+        "Tests/MOLAuthenticatingURLSessionTest.m",
         "Tests/MOLDERDecoderTest.m",
     ],
-    data = ["Tests/dn.plist"],
+    data = [
+        "Tests/dn.plist",
+        "Tests/example_org_client_cert.pem",
+        "Tests/example_org_client_cert_old.pem",
+        "Tests/internet_widgits_client_cert.pem",
+    ],
     deps = [":MOLAuthenticatingURLSession"],
 )
 
