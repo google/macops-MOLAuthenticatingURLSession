@@ -336,7 +336,45 @@
                          issuerCountryName:(NSString *)issuerCountryName
                              issuerOrgName:(NSString *)issuerOrgName
                              issuerOrgUnit:(NSString *)issuerOrgUnit {
-  NSMutableArray *predicates = [NSMutableArray arrayWithCapacity:4];
+  NSArray<MOLCertificate *> *sortedCerts = [self filterAndSortArray:array
+                                                         commonName:commonName
+                                                   issuerCommonName:issuerCommonName
+                                                  issuerCountryName:issuerCountryName
+                                                      issuerOrgName:issuerOrgName
+                                                      issuerOrgUnit:issuerOrgUnit];
+  for (MOLCertificate *cert in sortedCerts) {
+    SecIdentityRef identityRef = NULL;
+    OSStatus status = SecIdentityCreateWithCertificate(NULL, cert.certRef, &identityRef);
+    if (status == errSecSuccess) {
+      return identityRef;
+    } else {
+      // Avoid infinite recursion from self-signed certs
+      if ((!cert.commonName || [cert.commonName isEqual:cert.issuerCommonName]) &&
+          (!cert.countryName || [cert.countryName isEqual:cert.issuerCountryName]) &&
+          (!cert.orgName || [cert.orgName isEqual:cert.issuerOrgName]) &&
+          (!cert.orgUnit || [cert.orgUnit isEqual:cert.issuerOrgUnit])) {
+        continue;
+      }
+
+      // cert is an intermediate, recurse to find the leaf.
+      return [self identityByFilteringArray:array
+                                 commonName:nil
+                           issuerCommonName:cert.commonName
+                          issuerCountryName:cert.countryName
+                              issuerOrgName:cert.orgName
+                              issuerOrgUnit:cert.orgUnit];
+    }
+  }
+  return NULL;
+}
+
+- (NSArray<MOLCertificate *> *)filterAndSortArray:(NSArray<MOLCertificate *> *)array
+                                       commonName:(NSString *)commonName
+                                 issuerCommonName:(NSString *)issuerCommonName
+                                issuerCountryName:(NSString *)issuerCountryName
+                                    issuerOrgName:(NSString *)issuerOrgName
+                                    issuerOrgUnit:(NSString *)issuerOrgUnit {
+  NSMutableArray *predicates = [NSMutableArray arrayWithCapacity:5];
 
   if (commonName) {
     [predicates addObject:[NSPredicate predicateWithFormat:@"SELF.commonName == %@",
@@ -361,32 +399,12 @@
 
   NSCompoundPredicate *andPreds = [NSCompoundPredicate andPredicateWithSubpredicates:predicates];
 
-  NSArray *filteredCerts = [array filteredArrayUsingPredicate:andPreds];
-  if (!filteredCerts.count) return NULL;
+  NSArray<MOLCertificate *> *filteredCerts = [array filteredArrayUsingPredicate:andPreds];
+  if (!filteredCerts.count) return nil;
 
-  for (MOLCertificate *cert in filteredCerts) {
-    SecIdentityRef identityRef = NULL;
-    OSStatus status = SecIdentityCreateWithCertificate(NULL, cert.certRef, &identityRef);
-    if (status == errSecSuccess) {
-      return identityRef;
-    } else {
-      // Avoid infinite recursion from self-signed certs
-      if ((!cert.commonName || [cert.commonName isEqual:cert.issuerCommonName]) &&
-          (!cert.countryName || [cert.countryName isEqual:cert.issuerCountryName]) &&
-          (!cert.orgName || [cert.orgName isEqual:cert.issuerOrgName]) &&
-          (!cert.orgUnit || [cert.orgUnit isEqual:cert.issuerOrgUnit])) {
-        continue;
-      }
-
-      return [self identityByFilteringArray:array
-                                 commonName:nil
-                           issuerCommonName:cert.commonName
-                          issuerCountryName:cert.countryName
-                              issuerOrgName:cert.orgName
-                              issuerOrgUnit:cert.orgUnit];
-    }
-  }
-  return NULL;
+  return [filteredCerts sortedArrayUsingComparator:^(MOLCertificate *obj1, MOLCertificate *obj2) {
+    return [obj2.validFrom compare:obj1.validFrom];
+  }];
 }
 
 - (SecIdentityRef)identityFromFile:(NSString *)file password:(NSString *)password {

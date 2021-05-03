@@ -15,6 +15,7 @@
 #import <XCTest/XCTest.h>
 
 #import <MOLAuthenticatingURLSession/MOLDERDecoder.h>
+#import <MOLCertificate/MOLCertificate.h>
 
 @interface MOLDERDecoder (Testing)
 + (NSString *)decodeOIDWithBytes:(unsigned char *)bytes length:(NSUInteger)length;
@@ -24,14 +25,6 @@
 @end
 
 @implementation MOLDERDecoderTest
-
-- (void)setUp {
-  [super setUp];
-}
-
-- (void)tearDown {
-  [super tearDown];
-}
 
 - (void)testAllFields {
   NSString *file = [[NSBundle bundleForClass:[self class]] pathForResource:@"dn" ofType:@"plist"];
