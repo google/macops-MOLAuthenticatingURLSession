@@ -35,8 +35,8 @@
 
 - (instancetype)init {
   NSURLSessionConfiguration *config = [NSURLSessionConfiguration ephemeralSessionConfiguration];
-  [config setTLSMinimumSupportedProtocol:kTLSProtocol12];
-  [config setHTTPShouldUsePipelining:YES];
+  config.TLSMinimumSupportedProtocolVersion = tls_protocol_version_TLSv12;
+  config.HTTPShouldUsePipelining = YES;
   return [self initWithSessionConfiguration:config];
 }
 
@@ -308,17 +308,12 @@
   }
 
   // Evaluate the server's cert chain.
-  SecTrustResultType result = kSecTrustResultInvalid;
-  err = SecTrustEvaluate(protectionSpace.serverTrust, &result);
-  if (err != errSecSuccess) {
-    [self log:@"Server Trust: Unable to evaluate certificate chain for server: %d", err];
-    return nil;
-  }
-
-  // Having a trust level "unspecified" by the user is the usual result, described at
-  // https://developer.apple.com/library/mac/qa/qa1360
-  if (result != kSecTrustResultProceed && result != kSecTrustResultUnspecified) {
-    [self log:@"Server Trust: Server isn't trusted. SecTrustResultType: %d", result];
+  CFErrorRef cfErrRef;
+  if (!SecTrustEvaluateWithError(protectionSpace.serverTrust, &cfErrRef)) {
+    NSError *errRef = CFBridgingRelease(cfErrRef);
+    NSError *underlyingError = errRef.userInfo[NSUnderlyingErrorKey];
+    NSString *errMsg = CFBridgingRelease(SecCopyErrorMessageString((OSStatus)underlyingError.code, NULL));
+    [self log:@"Server Trust: Unable to evaluate certificate chain for server: %@ (%d)", errMsg, underlyingError.code];
     return nil;
   }
 
@@ -449,9 +444,8 @@
   // use the result of the evaluation. The certificates seem to be available
   // without calling this but the documentation is clear that
   // SecTrustGetCertificateAtIndex shouldn't be called without calling
-  // SecTrustEvaluate first.
-  SecTrustResultType _;  // unused
-  SecTrustEvaluate(t, &_);
+  // SecTrustEvaluateWithError first.
+  (void)SecTrustEvaluateWithError(t, NULL);
 
   NSMutableArray *intermediates = [NSMutableArray array];
   CFIndex certCount = SecTrustGetCertificateCount(t);
