@@ -30,15 +30,20 @@ If you'd like to print status/error information:
 
 ## Installation
 
-#### Using CocoaPods
+#### Using [Bazel](http://bazel.build) Modules
 
-Add the following line to your Podfile:
+Add the following to your MODULE.bazel:
 
+```bazel
+bazel_dep("molauthenticatingurlsession", version = "3.1")
+git_override(
+    module_name = "molauthenticatingurlsession",
+    remote = "https://github.com/google/macops-molauthenticatingurlsession.git",
+    tag = "v3.1",
+)
 ```
-pod 'MOLAuthenticatingURLSession'
-```
 
-#### Using [Bazel](http://bazel.build)
+#### Using [Bazel](http://bazel.build) WORKSPACE
 
 Add the following to your WORKSPACE:
 
@@ -47,33 +52,29 @@ load("@bazel_tools//tools/build_defs/repo:git.bzl", "git_repository")
 
 # Needed for MOLAuthenticatingURLSession
 git_repository(
-    name = "MOLCertificate",
+    name = "molcertificate",
     remote = "https://github.com/google/macops-molcertificate.git",
     tag = "v2.0",
 )
 
 git_repository(
-    name = "MOLAuthenticatingURLSession",
+    name = "molauthenticatingurlsession",
     remote = "https://github.com/google/macops-molauthenticatingurlsession.git",
     tag = "v2.5",
 )
 ```
 
-And in your BUILD file, add MOLXPCConnection as a dependency:
+### Adding dependency in BUILD
+
+In your BUILD file, add MOLAuthenticatingURLSession as a dependency:
 
 <pre>
 objc_library(
     name = "MyAwesomeApp_lib",
     srcs = ["src/MyAwesomeApp.m", "src/MyAwesomeApp.h"],
-    <strong>deps = ["@MOLAuthenticatingURLSession//:MOLAuthenticatingURLSession"],</strong>
+    <strong>deps = ["@molauthenticatingurlsession//:MOLAuthenticatingURLSession"],</strong>
 )
 </pre>
-
-## Documentation
-
-Reference documentation is at CocoaDocs.org:
-
-http://cocoadocs.org/docsets/MOLAuthenticatingURLSession
 
 ## Contributing
 

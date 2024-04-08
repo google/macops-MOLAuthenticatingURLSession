@@ -15,7 +15,7 @@ objc_library(
     includes = ["Source"],
     sdk_frameworks = ["Security"],
     visibility = ["//visibility:public"],
-    deps = ["@MOLCertificate//:MOLCertificate"],
+    deps = ["@molcertificate//:MOLCertificate"],
 )
 
 objc_library(
